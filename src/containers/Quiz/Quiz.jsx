@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { StylesManager, Model, surveyLocalization } from 'survey-core'
 import { Survey } from 'survey-react-ui'
@@ -39,7 +39,7 @@ function Quiz() {
    const surveyJson = useSelector(state => state.quiz.quiz)
    const [tabSwitchingCount, setTabSwitchingCount] = useState(0)
 
-   const survey = new Model(surveyJson)
+   const survey = useMemo(() => new Model(surveyJson), [surveyJson])
    const isVisibleFirstWarningModal = tabSwitchingCount === 1
 
    useEffect(() => {
@@ -47,12 +47,14 @@ function Quiz() {
    }, [])
 
    const handleDocumentVisibilityChange = useCallback(event => {
+      console.log('handleDocumentVisibilityChange')
       if (document.visibilityState !== 'visible') {
          setTabSwitchingCount(prev => ++prev)
       }
    }, [])
 
    const handleFullscreenChange = useCallback(event => {
+      console.log('handleFullscreenChange')
       /* Is closed fullscreen */
       if (!document.fullscreenElement) {
          setTabSwitchingCount(prev => ++prev)
@@ -73,16 +75,20 @@ function Quiz() {
 
    const handleCompleteQuiz = useCallback((sender) => {
       // const results = JSON.stringify(sender.data)
+      console.log('handleCompleteQuiz', sender)
       setTabSwitchingCount(0)
       removeChangeFullscreenListeners()
       document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
-   }, [])
+   }, [document])
 
    useEffect(() => {
       if (typeof window !== 'undefined') {
          document.addEventListener('visibilitychange', handleDocumentVisibilityChange)
          addFullscreenListeners()
       }
+
+      survey.startTimer()
+      survey.locale = 'ua'
 
       return () => {
          document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
@@ -91,6 +97,7 @@ function Quiz() {
    }, [])
 
    const handleExcessNumberOfPeeps = useCallback(() => {
+      console.log('handleExcessNumberOfPeeps')
       survey.clear(true, true)
       survey.stopTimer()
       setTabSwitchingCount(0)
@@ -103,8 +110,6 @@ function Quiz() {
    }, [])
 
    survey.onComplete.add(handleCompleteQuiz)
-   survey.startTimer()
-   survey.locale = 'ua'
 
    return (
       <div>
