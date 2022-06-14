@@ -22,9 +22,7 @@ export const Wrapper = styled.nav`
     text-decoration: none;
     color: inherit;
     
-    &.active {
-      color: #f00;
-    }
+    
   }
   
   ${({ isOpen }) => isOpen && css`

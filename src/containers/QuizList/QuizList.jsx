@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-
+import image from '../../images/TestList.png'
 import { fetchQuizzes } from '../../redux/actions/quizList'
 import Preloader from '../../components/Preloader/Preloader'
 import { Header } from '../../components/common/styles/Header'
@@ -32,7 +32,7 @@ const QuizList = ({ quizzes, isLoading, fetchQuizzes }) => {
 
    return (
       <S.Wrapper>
-         <Header>Список тестів</Header>
+         <Header><img src={image}></img></Header>
          <S.List>
             { quizList || <S.Empty>Список пустий</S.Empty> }
          </S.List>

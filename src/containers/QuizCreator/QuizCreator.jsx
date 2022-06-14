@@ -3,11 +3,12 @@ import { connect } from 'react-redux'
 import { createQuiz } from '../../redux/actions/quiz'
 import { Header } from '../../components/common/styles/Header'
 import * as S from './styles'
+import image from "../../images/CreateTest.png"
 
 const QuizCreator = ({ createQuiz }) => {
    return (
       <S.Wrapper>
-         <Header>Створення тесту</Header>
+         <Header><img src={image}></img></Header>
          <QuizCreatorForm createQuiz={ createQuiz } />
       </S.Wrapper>
    )

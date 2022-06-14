@@ -9,10 +9,13 @@ const Drawer = ({ isOpen, onClose, isAuthorized }) => {
 
    if (isAuthorized) {
       links = [
-         { text: 'Створити тест', to: '/create-quiz', exact: false },
-         { text: 'Список тестів', to: '/quiz-list', exact: false },
-         // { text: 'Survey', to: '/survey', exact: false },
-         { text: 'Вийти', to: '/logout', exact: false },
+         { text: 'Головна', to: '/', exact:  true },
+         { text: 'Особистий кабінет', to: '/me', exact:  true },
+         { text: 'Створити тест', to: '/create-quiz', exact:  true },
+         { text: 'Список тестів', to: '/quiz-list', exact:  true },
+         { text: 'Вихід', to: '/logout', exact:  true },
+         
+         
       ]
    } else {
       links = [
