@@ -4,6 +4,20 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Getting Started
+
+```bash
+# install dependencies
+npm install 
+# or 
+yarn install
+
+# run in development mode
+npm run start
+# or
+yarn start 
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
