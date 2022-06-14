@@ -11,6 +11,7 @@ import Modal from '../../components/Modal/Modal'
 import { fetchQuizById } from '../../redux/actions/quiz'
 import closeFullscreen from '../../utils/closeFullscreen'
 import openFullscreen from '../../utils/openFullscreen'
+import { remove } from 'final-form-arrays'
 
 const myCustomSurveyStrings = {
    timerInfoText: 'Час',
@@ -27,22 +28,18 @@ surveyLocalization.locales['ua'] = myCustomSurveyStrings
 
 const MAX_TAB_SWITCHING_COUNT = 3
 
+const fullscreenEventTypes = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange']
+
 function Quiz() {
 
    const history = useHistory()
-
    const params = useParams()
-
    const dispatch = useDispatch()
 
-   const handle = useFullScreenHandle()
-
    const surveyJson = useSelector(state => state.quiz.quiz)
-
-   const survey = new Model(surveyJson)
-
    const [tabSwitchingCount, setTabSwitchingCount] = useState(0)
 
+   const survey = new Model(surveyJson)
    const isVisibleFirstWarningModal = tabSwitchingCount === 1
 
    useEffect(() => {
@@ -50,39 +47,54 @@ function Quiz() {
    }, [])
 
    const handleDocumentVisibilityChange = useCallback(event => {
-      if (document.visibilityState === 'visible') {
-         console.log('tab is active')
-      } else {
-         console.log('tab is inactive')
+      if (document.visibilityState !== 'visible') {
          setTabSwitchingCount(prev => ++prev)
       }
-   }, [document])
+   }, [])
 
    const handleFullscreenChange = useCallback(event => {
-      /* Close fullscreen */
+      /* Is closed fullscreen */
       if (!document.fullscreenElement) {
          setTabSwitchingCount(prev => ++prev)
       }
    }, [document])
 
+   const removeChangeFullscreenListeners = useCallback(() => {
+      fullscreenEventTypes.forEach(
+         eventType => document.removeEventListener(eventType, handleFullscreenChange)
+      )
+   }, [])
+
+   const addFullscreenListeners = useCallback(() => {
+      fullscreenEventTypes.forEach(
+         eventType => document.addEventListener(eventType, handleFullscreenChange)
+      )
+   }, [])
+
+   const handleCompleteQuiz = useCallback((sender) => {
+      // const results = JSON.stringify(sender.data)
+      setTabSwitchingCount(0)
+      removeChangeFullscreenListeners()
+      document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
+   }, [])
+
    useEffect(() => {
       if (typeof window !== 'undefined') {
-         document.addEventListener('visibilitychange', handleDocumentVisibilityChange);
-
-         ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach(
-            eventType => document.addEventListener(eventType, handleFullscreenChange)
-         )
+         document.addEventListener('visibilitychange', handleDocumentVisibilityChange)
+         addFullscreenListeners()
       }
 
-      return () => document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
+      return () => {
+         document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
+         removeChangeFullscreenListeners()
+      }
    }, [])
 
    const handleExcessNumberOfPeeps = useCallback(() => {
       survey.clear(true, true)
       survey.stopTimer()
-
       setTabSwitchingCount(0)
-      closeFullscreen()
+      openFullscreen()
    }, [survey])
 
    const handleExitQuiz = useCallback(() => {
@@ -90,12 +102,7 @@ function Quiz() {
       history.push('/quiz-list')
    }, [])
 
-   const alertResults = useCallback((sender) => {
-      const results = JSON.stringify(sender.data)
-      console.log('results', results)
-   }, [])
-
-   survey.onComplete.add(alertResults)
+   survey.onComplete.add(handleCompleteQuiz)
    survey.startTimer()
    survey.locale = 'ua'
 
