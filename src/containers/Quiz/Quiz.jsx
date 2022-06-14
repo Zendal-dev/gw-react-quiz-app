@@ -87,7 +87,6 @@ function Quiz() {
          addFullscreenListeners()
       }
 
-      survey.startTimer()
       survey.locale = 'ua'
 
       return () => {
@@ -97,11 +96,12 @@ function Quiz() {
    }, [])
 
    const handleExcessNumberOfPeeps = useCallback(() => {
-      console.log('handleExcessNumberOfPeeps')
-      survey.clear(true, true)
-      survey.stopTimer()
-      setTabSwitchingCount(0)
-      openFullscreen()
+      // survey.clear(true, true)
+      // survey.stopTimer()
+      // setTabSwitchingCount(0)
+      // openFullscreen()
+      closeFullscreen()
+      history.push('/quiz-list')
    }, [survey])
 
    const handleExitQuiz = useCallback(() => {
@@ -109,6 +109,7 @@ function Quiz() {
       history.push('/quiz-list')
    }, [])
 
+   survey.startTimer()
    survey.onComplete.add(handleCompleteQuiz)
 
    return (
